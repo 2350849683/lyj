@@ -1,9 +1,7 @@
 # coding=utf-8
 import logging
-import psutil
 import socket
 from datetime import datetime, timedelta
-import uuid
 import locale
 from flask import render_template, request, session, jsonify, Response, Blueprint, current_app, g
 from werkzeug.local import LocalProxy

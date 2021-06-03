@@ -5,9 +5,8 @@ import platform
 import psutil
 import socket
 import time
-import zerorpc
 from psdash.log import Logs
-from psdash.helpers import socket_families, socket_types
+from psdash.helpers import con
 from psdash.net import get_interface_addresses, NetIOCounters
 
 
@@ -254,16 +253,7 @@ class LocalService(object):
         proc = psutil.Process(pid)
         connections = []
         for c in proc.connections(kind='all'):
-            conn = {
-                'fd': c.fd,
-                'family': socket_families[c.family],
-                'type': socket_types[c.type],
-                'local_addr_host': c.laddr[0] if c.laddr else None,
-                'local_addr_port': c.laddr[1] if c.laddr else None,
-                'remote_addr_host': c.raddr[0] if c.raddr else None,
-                'remote_addr_port': c.raddr[1] if c.raddr else None,
-                'state': c.status
-            }
+            conn = con(c)
             connections.append(conn)
 
         return connections
@@ -290,17 +280,7 @@ class LocalService(object):
         connections = []
 
         for c in psutil.net_connections('all'):
-            conn = {
-                'fd': c.fd,
-                'pid': c.pid,
-                'family': socket_families[c.family],
-                'type': socket_types[c.type],
-                'local_addr_host': c.laddr[0] if c.laddr else None,
-                'local_addr_port': c.laddr[1] if c.laddr else None,
-                'remote_addr_host': c.raddr[0] if c.raddr else None,
-                'remote_addr_port': c.raddr[1] if c.raddr else None,
-                'state': c.status
-            }
+            conn = con(c)
 
             for k, v in filters.iteritems():
                 if v and conn.get(k) != v:
