@@ -4,8 +4,6 @@ class Node(object):
     def __init__(self):
         self.service = None
 
-    def create_service(self):
-        return NotImplementedError
 
     def get_service(self):
         if not self.service:
