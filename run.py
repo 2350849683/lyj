@@ -7,11 +7,11 @@ import random
 from gevent.pywsgi import WSGIServer
 from node import RemoteNode,LocalNode
 class Runer():
-    def __init__(self,host,port,as_rpc,hostname):
-        self.host=host
-        self.port =port
-        self.hostname=hostname
-        self.as_rpc=as_rpc
+    def __init__(self,**psdash):
+        self.host=psdash['host']
+        self.port =psdash['port']
+        self.hostname=psdash['as_name']
+        self.as_rpc=psdash['as_rpc']
         self.nodes={}
         self.local=LocalNode()
 
@@ -50,7 +50,7 @@ class Runer():
 @click.option("-a",'--as_rpc',default=None, help='psdash节点来注册这个代理启动。如http://127.0.0.1:5000')
 @click.option("-n",'--as_name',default="psdash", help='psdash节点名字')
 def main(host,port,as_rpc,as_name):
-    run=Runer(host,port,as_rpc,as_name)
+    run=Runer(**locals())
     if as_rpc:
         run.run_as_rpc()    #启动rpc
     else:
