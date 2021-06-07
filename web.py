@@ -14,11 +14,17 @@ def memory(hostname,kind):
     if kind=="memory":
         return jsonify(current_service.memory())
     elif kind=="disks":
-        return  jsonify(current_service.get_disks())
+        s=""
+        for i in current_service.get_disks():
+            s+=str(i)+"<br />"
+        return  s
     elif kind == "cpu":
         return str(current_service.get_cpu())
     elif kind == "pids":
-        return  jsonify(current_service.get_pid())
+        s=""
+        for i in current_service.get_pid():
+            s+=str(i)+"<br />"
+        return  s
 
 
 @web.route("/register")
