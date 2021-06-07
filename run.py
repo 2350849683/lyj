@@ -1,25 +1,29 @@
 from  flask import Flask
+from gevent.monkey import patch_all
+patch_all()
 import click
 import zerorpc
 import requests
 from web import web
-import random
 from gevent.pywsgi import WSGIServer
 from node import RemoteNode,LocalNode
+
+
 class Runer():
-    def __init__(self,host,port,as_rpc,hostname):
-        self.host=host
-        self.port =port
-        self.hostname=hostname
-        self.as_rpc=as_rpc
+    def __init__(self,**psdash):
+        self.host=psdash['host']
+        self.port =psdash['port']
+        self.hostname=psdash['as_name']
+        self.as_rpc=psdash['as_rpc']
         self.nodes={}
-        self.local=LocalNode()
+        self.node={}
+        self.local=LocalNode(psdash['as_name'])
 
     def register_agent(slef,node,name):   #作为rpc server 启动时，向http server 注册
         print(f"已注册 {node}")
         host,port= node.split(":")
-        slef.nodes[f'{name}:{node}']=RemoteNode(host,port)   #远端数据存储
-
+        slef.nodes[f'{name}:{node}']=""   #远端数据存储
+        slef.node[name]=RemoteNode(host, port)
 
     def create_app(slef):  #创建flask app 对象
         app = Flask(__name__)
@@ -29,7 +33,8 @@ class Runer():
 
     def run_as_web(slef):  #作为http server启动
         slef.create_app()
-        slef.nodes[f"{slef.hostname}:localnode:{slef.port}"]= slef.local #本地数据存储
+        slef.nodes[f"{slef.hostname}:localnode:{slef.port}"]= "" #本地数据存储
+        slef.node[slef.hostname]=slef.local
         print(f"已启动  localnode:{slef.port}  http  server")
         slef.server = WSGIServer((slef.host,slef.port),application=slef.app,)
         slef.server.serve_forever()
@@ -50,7 +55,7 @@ class Runer():
 @click.option("-a",'--as_rpc',default=None, help='psdash节点来注册这个代理启动。如http://127.0.0.1:5000')
 @click.option("-n",'--as_name',default="psdash", help='psdash节点名字')
 def main(host,port,as_rpc,as_name):
-    run=Runer(host,port,as_rpc,as_name)
+    run=Runer(**locals())
     if as_rpc:
         run.run_as_rpc()    #启动rpc
     else:
