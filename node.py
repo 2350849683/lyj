@@ -66,8 +66,8 @@ class LocalService(object):
 
     def get_cpu(self):
         cpu={
-        "双核超线程":psutil.cpu_count(),
-        "非超线程":psutil.cpu_count(logical=False)
+        "hyperthreading":psutil.cpu_count(),
+        "Not hyper-threading":psutil.cpu_count(logical=False)
         }
         return cpu
 
