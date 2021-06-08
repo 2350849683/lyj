@@ -8,23 +8,15 @@ web = Blueprint('psdash', __name__)
 
 @web.route("/<string:hostname>/<string:kind>")
 def memory(hostname,kind):
-
     current_service=current_app.psdash.node[hostname].get_service()
-
     if kind=="memory":
         return jsonify(current_service.memory())
     elif kind=="disks":
-        s=""
-        for i in current_service.get_disks():
-            s+=str(i)+"<br />"
-        return  s
+        return  jsonify(current_service.get_disks())
     elif kind == "cpu":
-        return str(current_service.get_cpu())
+        return jsonify(current_service.get_cpu())
     elif kind == "pids":
-        s=""
-        for i in current_service.get_pid():
-            s+=str(i)+"<br />"
-        return  s
+        return  jsonify(current_service.get_pid())
 
 
 @web.route("/register")
@@ -40,4 +32,4 @@ def nodes():
     for node in  current_app.psdash.nodes:
         node=node.split(":")
         a.append({"hostname":node[0],"host":node[1],"port":int(node[2])})
-    return str(a)+str(current_app.psdash.node)
+    return jsonify(a)
