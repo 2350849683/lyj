@@ -40,4 +40,4 @@ def nodes():
     for node in  current_app.psdash.nodes:
         node=node.split(":")
         a.append({"hostname":node[0],"host":node[1],"port":int(node[2])})
-    return str(a)+str(current_app.psdash.node)
+    return str(a)
