@@ -81,3 +81,10 @@ class LocalService(object):
             }
             pid.append(pids)
         return pid
+    def get_pid_int(self,pid):
+        p=psutil.Process(pid)
+        pi={
+            "name":p.name(),
+            "path":p.exe()
+        }
+        return pi

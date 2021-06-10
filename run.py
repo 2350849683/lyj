@@ -50,8 +50,8 @@ class Runer():
 
 
 @click.command()
-@click.option("-h",'--host', default='0.0.0.0', help='输入ip')
-@click.option('-p',"--port",type=int,default=5000 ,help='输入端口号')
+@click.option("-h",'--host', default='0.0.0.0', help='输入ip，默认为0.0.0.0')
+@click.option('-p',"--port",type=int,default=5000 ,help='输入端口号,默认为5000')
 @click.option("-a",'--as_rpc',default=None, help='psdash节点来注册这个代理启动。如http://127.0.0.1:5000')
 @click.option("-n",'--as_name',default="psdash", help='psdash节点名字')
 def main(host,port,as_rpc,as_name):
