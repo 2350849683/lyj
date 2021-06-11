@@ -2,6 +2,7 @@ from  flask import Flask
 from gevent.monkey import patch_all
 patch_all()
 import click
+import socket
 import zerorpc
 import requests
 from web import web
@@ -19,6 +20,8 @@ class Runer():
         self.node={}
         self.local=LocalNode(psdash['as_name'])
 
+
+
     def register_agent(slef,node,name):   #作为rpc server 启动时，向http server 注册
         print(f"已注册 {node}")
         host,port= node.split(":")
@@ -32,15 +35,17 @@ class Runer():
         slef.app = app
 
     def run_as_web(slef):  #作为http server启动
+        local_name="psdash"
         slef.create_app()
-        slef.nodes[f"{slef.hostname}:localnode:{slef.port}"]= "" #本地数据存储
-        slef.node[slef.hostname]=slef.local
+        slef.nodes[f"{local_name}:localnode:{slef.port}"]= "" #本地数据存储
+        slef.node[local_name]=slef.local
         print(f"已启动  localnode:{slef.port}  http  server")
         slef.server = WSGIServer((slef.host,slef.port),application=slef.app,)
         slef.server.serve_forever()
 
     def run_as_rpc(slef):  #作为rpc server 启动
-
+        if  not slef.hostname:
+            slef.hostname=socket.gethostname()
         requests.get(slef.as_rpc + f"/register?port={slef.port}&name={slef.hostname}")  #请求 注册
         locals = slef.local.get_service()  #本地数据
         print(f"已启动 {slef.host}:{slef.port} rpc server")
@@ -53,7 +58,7 @@ class Runer():
 @click.option("-h",'--host', default='0.0.0.0', help='输入ip，默认为0.0.0.0')
 @click.option('-p',"--port",type=int,default=5000 ,help='输入端口号,默认为5000')
 @click.option("-a",'--as_rpc',default=None, help='psdash节点来注册这个代理启动。如http://127.0.0.1:5000')
-@click.option("-n",'--as_name',default="psdash", help='psdash节点名字')
+@click.option("-n",'--as_name',default=None, help='psdash节点名字')
 def main(host,port,as_rpc,as_name):
     run=Runer(**locals())
     if as_rpc:

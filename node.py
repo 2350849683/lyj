@@ -1,5 +1,6 @@
 import zerorpc
 import psutil
+from datetime import datetime, timedelta
 
 class Node(object):
     def __init__(self):
@@ -36,6 +37,8 @@ class LocalNode(Node):
 class LocalService(object):
     def __init__(self,node):
         self.node=node
+
+
     def memory(self):#获取内存
         info = psutil.virtual_memory()
         cs={
@@ -75,16 +78,33 @@ class LocalService(object):
         pid = []
         p = psutil.pids()
         for i in p:
-            pids = {
-                "name": psutil.Process(i).name(),
-                "pid": i,
-            }
-            pid.append(pids)
+            p1=psutil.Process(i)
+            try:
+                pids = {
+                    "name": p1.name(),
+                    "pid": i,
+                    "path_exe":p1.exe(),
+                    "time":p1.create_time()
+                }
+                pid.append(pids)
+            except:
+                pass
+
         return pid
     def get_pid_int(self,pid):
         p=psutil.Process(pid)
         pi={
             "name":p.name(),
-            "path":p.exe()
+            "path":p.exe(),
+            "state" :p.status()
         }
         return pi
+
+    def psdash(self):
+        all={
+            "pid":self.get_pid(),
+            "cpu":self.get_cpu(),
+            "disks":self.get_disks(),
+            "memory":self.memory()
+        }
+        return all

@@ -5,10 +5,10 @@ from flask import Blueprint,current_app,request,jsonify
 web = Blueprint('psdash', __name__)
 
 
-
-@web.route("/<string:hostname>/<string:kind>/",defaults={'pid': None})
+@web.route("/<string:hostname>")
+@web.route("/<string:hostname>/<string:kind>")
 @web.route("/<string:hostname>/<string:kind>/<int:pid>")
-def memory(hostname,kind,pid):
+def memory(hostname,kind=None,pid=None):
     current_service=current_app.psdash.node[hostname].get_service()
     if kind=="memory":
         return jsonify(current_service.memory())
@@ -21,6 +21,8 @@ def memory(hostname,kind,pid):
             return  jsonify(current_service.get_pid())
         else:
             return jsonify(current_service.get_pid_int(pid))
+    else:
+        return jsonify(current_service.psdash())
 
 @web.route("/register")
 def register():
